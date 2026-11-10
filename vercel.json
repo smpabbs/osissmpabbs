@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/osis.js": {
+      "regions": ["sin1"]
+    }
+  }
+}

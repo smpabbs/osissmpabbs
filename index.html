@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pemilihan Ketua OSIS — SMP ABBS Surakarta</title>
+  <meta name="description" content="Bilik suara digital Pemilihan Ketua OSIS SMP ABBS Surakarta. Masuk dengan akun LMS, kenali kandidatnya, dan tentukan pilihanmu.">
+  <meta name="theme-color" content="#061a12">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Pemilihan Ketua OSIS SMP ABBS Surakarta">
+        <span class="brand-mark">OSIS</span>
+        <span class="brand-text">SMP ABBS <span>Surakarta</span></span>
+      </a>
+      <div class="session-wrap" id="sessionWrap" hidden>
+        <span class="session-chip" id="sessionChip">
+          <span class="session-dot" aria-hidden="true"></span>
+          <span id="sessionName"></span>
+        </span>
+        <button class="logout-btn" id="logoutBtn" type="button">Keluar</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="view loading-view" id="loadingView" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Menyiapkan bilik suara…</p>
+      </section>
+
+      <section class="view" id="loginView" hidden>
+        <div class="login-shell">
+          <div class="login-intro">
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>PILKETOS SMP ABBS</p>
+            <h1>Suaramu,<br><span class="grad">arah baru.</span></h1>
+            <p class="lede">Masuk dengan akun LMS, kenali kandidatnya, lalu tentukan pilihanmu. Satu akun, satu kesempatan.</p>
+            <div class="hero-meta">
+              <span class="meta-pill">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11H4zM8 8V5h8v3M8 12h4"/></svg>
+                5 kandidat
+              </span>
+              <span class="meta-pill">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                Akun LMS
+              </span>
+              <span class="meta-pill">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+                Sekali kirim
+              </span>
+            </div>
+          </div>
+
+          <div class="login-card">
+            <p class="eyebrow">BILIK SUARA</p>
+            <h2>Masuk ke bilik suara</h2>
+            <p class="hint">Gunakan NIS atau username akun LMS kamu.</p>
+            <p class="form-notice" id="loginNotice" role="status" hidden></p>
+
+            <form id="loginForm" novalidate>
+              <div class="field">
+                <label for="identifier">NIS / Username</label>
+                <input id="identifier" name="identifier" type="text" inputmode="text"
+                       autocomplete="username" autocapitalize="none" spellcheck="false"
+                       placeholder="NIS siswa atau username guru" required>
+              </div>
+              <div class="field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password"
+                       autocomplete="current-password" placeholder="Password akun LMS" required>
+              </div>
+              <p class="form-error" id="loginError" role="alert" hidden></p>
+              <button class="btn btn-gold btn-block" type="submit" id="loginBtn">
+                <span id="loginBtnLabel">Masuk dan pilih</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </button>
+            </form>
+
+            <p class="fineprint">Pilihanmu tidak ditampilkan ke publik. Satu akun hanya bisa mengirim satu kali.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="ballotView" hidden>
+        <div class="ballot-head">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>BILIK SUARA</p>
+            <h1>Halo, <span id="voterName"></span>.</h1>
+            <p class="lede" id="ballotInstruction"></p>
+          </div>
+          <div class="role-chip" id="roleChip"></div>
+        </div>
+
+        <div class="candidate-list" id="candidateGrid"></div>
+        <p class="form-error ballot-error" id="voteError" role="alert" hidden></p>
+      </section>
+
+      <section class="view" id="doneView" hidden>
+        <div class="done-card">
+          <div class="done-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12.5l4.5 4.5L19 7"/>
+            </svg>
+          </div>
+          <p class="eyebrow">SUARA TERCATAT</p>
+          <h1>Terima kasih, <span id="doneName"></span>.</h1>
+          <p class="lede" id="doneMessage"></p>
+          <p class="done-note">Pilihanmu tidak ditampilkan ke publik dan tidak dapat diubah.</p>
+          <div class="done-actions">
+            <p class="done-countdown">Kembali ke login dalam <strong id="logoutCount">6</strong> detik.</p>
+            <button class="btn btn-outline" type="button" id="doneBtn">Selesai sekarang</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Panitia Pemilihan Ketua OSIS</span>
+      <span class="footer-dot" aria-hidden="true"></span>
+      <span>SMP ABBS Surakarta</span>
+    </footer>
+  </div>
+
+  <div class="ballot-bar" id="ballotBar" hidden>
+    <div class="ballot-bar-inner">
+      <div class="pick-status">
+        <p class="pick-counter" aria-live="polite">
+          <strong id="pickCount">0</strong><span id="pickTotal">/1</span> dipilih
+        </p>
+        <div class="pick-track" aria-hidden="true"><span id="pickFill"></span></div>
+      </div>
+      <button class="btn btn-gold" type="button" id="voteBtn" disabled>
+        <span id="voteBtnLabel">Kirim suara</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <noscript>
+    <p class="noscript">Aktifkan JavaScript untuk menggunakan bilik suara ini.</p>
+  </noscript>
+  <script src="/app.js" defer></script>
+</body>
+</html>

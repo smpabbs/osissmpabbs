@@ -1,0 +1,9 @@
+.env*
+.git
+.vercel
+node_modules
+tests
+dev-server.mjs
+README.md
+supabase
+assets/visimisi.txt
