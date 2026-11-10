@@ -47,8 +47,14 @@
   function renderPodium(candidates) {
     const box = $('podium');
     box.replaceChildren();
-    const top = candidates.slice(0, 3);
-    const order = [top[1], top[0], top[2]].filter(Boolean);
+    // Urutan podium 5 besar: 4 · 2 · 1 · 3 · 5 (juara 1 di tengah, paling tinggi).
+    const order = [
+      candidates[3],
+      candidates[1],
+      candidates[0],
+      candidates[2],
+      candidates[4],
+    ].filter(Boolean);
 
     if (!order.length) {
       box.appendChild(el('p', 'empty-state', 'Belum ada kandidat aktif.'));
