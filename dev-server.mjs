@@ -36,7 +36,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const relative = urlPath === '/' ? 'index.html' : decodeURIComponent(urlPath).replace(/^\/+/, '');
+    let relative = urlPath === '/' ? 'index.html' : decodeURIComponent(urlPath).replace(/^\/+/, '');
+    if (!relative || relative.endsWith('/')) relative += 'index.html';
+    if (urlPath === '/pantau') relative = 'pantau/index.html';
     if (relative.split('/').some((part) => part.startsWith('.'))) {
       res.writeHead(404);
       return res.end('Not found');

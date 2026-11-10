@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pantau Pemilihan — SMP ABBS Surakarta</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#061a12">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/pantau/pantau.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Pemilihan Ketua OSIS SMP ABBS Surakarta">
+        <span class="brand-mark">OSIS</span>
+        <span class="brand-text">SMP ABBS <span>Surakarta</span></span>
+      </a>
+      <span class="live-chip" id="liveChip" hidden>
+        <span class="live-dot" aria-hidden="true"></span>
+        LIVE <span class="live-time" id="updatedAt"></span>
+      </span>
+    </header>
+
+    <main>
+      <section class="gate-view" id="gateView">
+        <form class="gate-card" id="gateForm" novalidate>
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>PANTAU PEMILIHAN</p>
+          <h1>Halaman panitia</h1>
+          <p class="lede">Hasil sementara Pemilihan Ketua OSIS SMP ABBS Surakarta. Halaman ini hanya untuk panitia.</p>
+          <div class="field">
+            <label for="pantauPassword">Password panitia</label>
+            <input id="pantauPassword" name="password" type="password" autocomplete="current-password"
+                   placeholder="Masukkan password" required>
+          </div>
+          <p class="form-error" id="gateError" role="alert" hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" id="gateSubmit">Masuk</button>
+        </form>
+      </section>
+
+      <section id="dashboard" hidden>
+        <div class="dash-head">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>HASIL SEMENTARA</p>
+            <h1>Pemilihan Ketua OSIS</h1>
+            <p class="dash-meta">
+              SMP ABBS Surakarta ·
+              <strong id="totalPicks">0</strong> pilihan dari
+              <strong id="totalVoters">0</strong> pemilih
+            </p>
+          </div>
+        </div>
+
+        <section class="podium" id="podium" aria-label="Podium hasil sementara"></section>
+
+        <section class="panel">
+          <h2>Perolehan suara</h2>
+          <div class="bar-list" id="barList"></div>
+        </section>
+
+        <div class="turnout-grid">
+          <section class="panel">
+            <h2>Partisipasi pemilih</h2>
+            <div class="turnout-cards" id="turnoutCards"></div>
+          </section>
+
+          <section class="panel">
+            <h2>Per kelas</h2>
+            <div class="class-list" id="classList"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Panitia Pemilihan Ketua OSIS</span>
+      <span class="footer-dot" aria-hidden="true"></span>
+      <span>SMP ABBS Surakarta</span>
+    </footer>
+  </div>
+
+  <noscript>
+    <p class="noscript">Aktifkan JavaScript untuk melihat hasil pemilihan.</p>
+  </noscript>
+  <script src="/pantau/pantau.js" defer></script>
+</body>
+</html>

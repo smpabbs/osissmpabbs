@@ -1,0 +1,461 @@
+/* Halaman pantau panitia. Memakai variabel & komponen dasar dari styles.css. */
+
+.live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid rgba(142, 230, 193, 0.3);
+  border-radius: 999px;
+  background: rgba(142, 230, 193, 0.08);
+  color: var(--mint);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.live-chip.is-stale {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 0 4px rgba(142, 230, 193, 0.16);
+  animation: live-pulse 1.8s ease-in-out infinite;
+}
+
+.live-chip.is-stale .live-dot {
+  background: var(--text-muted);
+  box-shadow: none;
+  animation: none;
+}
+
+.live-time {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+@keyframes live-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Gerbang password */
+.gate-view {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 24px 0 48px;
+}
+
+.gate-card {
+  width: min(430px, 100%);
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(8, 35, 25, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.gate-card h1 {
+  margin-top: 10px;
+  color: var(--text);
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+}
+
+.gate-card .lede {
+  margin: 10px 0 22px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.gate-card .field {
+  margin-bottom: 14px;
+}
+
+.gate-card .form-error {
+  margin-top: 0;
+}
+
+/* Dasbor */
+#dashboard:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 40px;
+}
+
+.dash-head {
+  padding: clamp(12px, 3vh, 26px) 0 4px;
+}
+
+.dash-head h1 {
+  margin-top: 8px;
+  font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+}
+
+.dash-meta {
+  margin-top: 10px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+}
+
+.dash-meta strong {
+  color: var(--text);
+}
+
+/* Podium */
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  margin: 24px 0 28px;
+}
+
+.podium-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 14px 20px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
+  text-align: center;
+}
+
+.podium-card.place-1 {
+  padding-top: 26px;
+  padding-bottom: 26px;
+  border-color: rgba(215, 180, 90, 0.6);
+  background: linear-gradient(180deg, rgba(215, 180, 90, 0.2), rgba(215, 180, 90, 0.04));
+  box-shadow: 0 0 50px -22px rgba(215, 180, 90, 0.7);
+}
+
+.podium-card.place-2 {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.podium-card.place-3 {
+  border-color: rgba(197, 137, 92, 0.45);
+}
+
+.podium-rank {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.podium-card.place-1 .podium-rank {
+  background: linear-gradient(135deg, #f4e3b0, #d7b45a);
+  color: #1a1406;
+}
+
+.podium-card.place-2 .podium-rank {
+  background: linear-gradient(135deg, #f2f4f5, #aab4bb);
+  color: #1a2126;
+}
+
+.podium-card.place-3 .podium-rank {
+  background: linear-gradient(135deg, #e7bd96, #b07a4e);
+  color: #241408;
+}
+
+.podium-photo,
+.podium-card .avatar-fallback {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 16%;
+  border: 3px solid rgba(255, 255, 255, 0.22);
+  background: #0b2a1f;
+}
+
+.podium-card.place-1 .podium-photo,
+.podium-card.place-1 .avatar-fallback {
+  width: 106px;
+  height: 106px;
+  border-color: var(--gold);
+}
+
+.avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 800;
+  font-size: 1.4rem;
+}
+
+.podium-name {
+  margin-top: 12px;
+  color: #fffdf7;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.podium-percent {
+  margin-top: 8px;
+  color: var(--gold-soft);
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.podium-card.place-1 .podium-percent {
+  font-size: 2.2rem;
+}
+
+.podium-votes {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Panel umum */
+.panel {
+  padding: clamp(16px, 2.5vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.panel h2 {
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+/* Bar perolehan */
+.bar-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 58px;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.bar-row:last-child {
+  border-bottom: 0;
+}
+
+.bar-rank {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.bar-main {
+  min-width: 0;
+}
+
+.bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.bar-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-votes {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.bar-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8ee6c1, #d7b45a);
+  transition: width 0.5s ease;
+}
+
+.bar-percent {
+  color: var(--gold-soft);
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+/* Partisipasi */
+.turnout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.turnout-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.turnout-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.turnout-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.turnout-percent {
+  display: block;
+  margin: 5px 0 3px;
+  color: var(--mint);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.turnout-card.gold .turnout-percent {
+  color: var(--gold-soft);
+}
+
+.turnout-meta {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.class-list {
+  margin-top: 6px;
+}
+
+.class-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 62px 50px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.class-row:last-child {
+  border-bottom: 0;
+}
+
+.class-name {
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.class-meta {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.class-percent {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .podium {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+
+  .podium-card.place-1 {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .podium-card.place-2,
+  .podium-card.place-3 {
+    order: 1;
+  }
+
+  .podium-photo,
+  .podium-card .avatar-fallback {
+    width: 70px;
+    height: 70px;
+  }
+
+  .podium-card.place-1 .podium-photo,
+  .podium-card.place-1 .avatar-fallback {
+    width: 88px;
+    height: 88px;
+  }
+
+  .turnout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .gate-card {
+    padding: 22px;
+  }
+
+  .bar-row {
+    grid-template-columns: 24px minmax(0, 1fr) 50px;
+    gap: 9px;
+  }
+
+  .class-row {
+    grid-template-columns: 44px minmax(0, 1fr) 52px 44px;
+    gap: 8px;
+  }
+
+  .turnout-cards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -31,7 +31,8 @@ Kedua key Supabase hanya ada di server (environment variable). Browser tidak per
 index.html            halaman login, bilik suara, terima kasih
 styles.css
 app.js
-api/osis.js           satu endpoint: GET sesi, POST login / vote / logout
+api/osis.js           satu endpoint: GET sesi, POST login / vote / logout / pantau
+pantau/               halaman panitia: podium + partisipasi per kelas
 dev-server.mjs        server lokal (halaman + API sekaligus)
 package.json          script npm run dev / npm test
 assets/               favicon + 5 foto kandidat + visimisi.txt
@@ -83,8 +84,10 @@ npm test
    |---|---|
    | `LMS_SUPABASE_URL` | `https://drlsnhnqxkcgcuskswwx.supabase.co` |
    | `LMS_SUPABASE_ANON_KEY` | anon key project LMS |
+   | `LMS_SUPABASE_SERVICE_KEY` | service_role key project LMS (opsional, untuk persentase partisipasi di `/pantau`) |
    | `VOTE_SUPABASE_URL` | `https://fsrfvkaqbhfuptsooxiv.supabase.co` |
    | `VOTE_SUPABASE_SERVICE_KEY` | service_role key project suara |
+   | `PANTAU_PASSWORD` | password halaman `/pantau` (opsional, default `osis2627`) |
 
    Salin nilainya dari `.env.local`. **Jangan** commit `.env.local`.
 
@@ -128,7 +131,14 @@ Bila `foto_url` kosong atau gambar gagal dimuat, kartu menampilkan inisial nama.
 
 ## Melihat hasil
 
-Di SQL Editor project suara:
+Halaman panitia: buka `/pantau` (mis. `https://osissmpabbs.vercel.app/pantau`), lalu masukkan password panitia. Halaman menampilkan podium 5 kandidat, persentase perolehan suara, dan partisipasi pemilih per kelas serta guru. Data diperbarui otomatis setiap 5 detik.
+
+- Password diatur lewat env `PANTAU_PASSWORD`; bila env kosong dipakai `osis2627`.
+- Persentase kandidat dihitung dari seluruh pilihan yang masuk: siswa 1 pilihan, guru 2 pilihan. Jumlah persentase seluruh kandidat = 100% dari semua pilihan.
+- Persentase partisipasi per kelas dan guru memerlukan env `LMS_SUPABASE_SERVICE_KEY` (service_role project LMS). Tanpa env itu, halaman tetap menampilkan jumlah suara yang sudah masuk, tetapi total pemilih dan persentasenya tampil "—".
+- Halaman ini tidak ditautkan dari bilik suara dan diberi `noindex`. Jangan bagikan URL/password ke siswa.
+
+Rekap langsung di SQL Editor project suara:
 
 ```sql
 -- Jumlah suara per kandidat (setiap pilihan dihitung)

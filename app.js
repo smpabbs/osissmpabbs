@@ -265,6 +265,10 @@
       sub.className = 'candidate-sub';
       sub.textContent = candidate.kelas || 'Calon Ketua OSIS';
 
+      const picked = document.createElement('span');
+      picked.className = 'candidate-picked';
+      picked.textContent = 'DIPILIH';
+
       const details = document.createElement('button');
       details.type = 'button';
       details.className = 'candidate-details';
@@ -274,7 +278,7 @@
         openCandidateDialog(candidate.no_urut);
       });
 
-      info.append(name, sub, details);
+      info.append(picked, name, sub, details);
       card.appendChild(info);
 
       card.addEventListener('click', () => toggle(candidate.no_urut));
@@ -316,6 +320,7 @@
       const selected = state.picks.includes(Number(card.dataset.no));
       card.setAttribute('aria-checked', selected ? 'true' : 'false');
     }
+    $('candidateGrid').classList.toggle('has-picks', state.picks.length > 0);
 
     const limit = pickLimit();
     $('pickCount').textContent = String(state.picks.length);

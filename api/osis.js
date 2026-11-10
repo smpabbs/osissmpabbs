@@ -2,14 +2,19 @@
 // Login diverifikasi ke Supabase LMS (project A); suara disimpan ke project B.
 // Kedua service key hanya dipakai di server, tidak pernah dikirim ke browser.
 
+const crypto = require('node:crypto');
+
 const LMS_URL = process.env.LMS_SUPABASE_URL;
 const LMS_ANON = process.env.LMS_SUPABASE_ANON_KEY;
+const LMS_SERVICE = process.env.LMS_SUPABASE_SERVICE_KEY;
 const VOTE_URL = process.env.VOTE_SUPABASE_URL;
 const VOTE_KEY = process.env.VOTE_SUPABASE_SERVICE_KEY;
 
 const SEKOLAH_ID = '503a0f26-abeb-4a0f-94a4-2f4a23fc96d2'; // SMP ABBS Surakarta
 const COOKIE = 'osis_session';
 const SESSION_MAX_AGE = 3600;
+// shortcut: default di kode, ganti lewat env PANTAU_PASSWORD bila perlu.
+const PANTAU_PASSWORD = process.env.PANTAU_PASSWORD || 'osis2627';
 
 function pickLimit(role) {
   return role === 'siswa' ? 1 : 2;
@@ -122,6 +127,162 @@ async function hasVoted(voterId) {
   if (!res.ok) throw new Error(`cek suara gagal: ${res.status}`);
   const rows = await res.json();
   return rows.length > 0;
+}
+
+async function getVotes() {
+  const rows = [];
+  for (let offset = 0; ; offset += 1000) {
+    const res = await fetch(
+      `${VOTE_URL}/rest/v1/osis_votes?select=candidate_nos,voter_role,voter_kelas&limit=1000&offset=${offset}`,
+      {
+        headers: {
+          apikey: VOTE_KEY,
+          Authorization: `Bearer ${VOTE_KEY}`,
+          'Accept-Profile': 'public',
+        },
+      },
+    );
+    if (!res.ok) throw new Error(`baca suara gagal: ${res.status}`);
+    const page = await res.json();
+    rows.push(...page);
+    if (page.length < 1000) return rows;
+  }
+}
+
+// Total siswa/guru aktif per kelas dari LMS. Butuh service key karena RLS
+// menolak enumerasi profiles dengan anon key.
+let eligibleCache = { at: 0, value: null };
+async function getEligibleTotals() {
+  if (!LMS_SERVICE) return null;
+  if (eligibleCache.value && Date.now() - eligibleCache.at < 5 * 60 * 1000) {
+    return eligibleCache.value;
+  }
+
+  const rows = [];
+  for (let offset = 0; ; offset += 1000) {
+    const res = await fetch(
+      `${LMS_URL}/rest/v1/profiles?select=role,kelas&sekolah_id=eq.${SEKOLAH_ID}` +
+        `&status=eq.aktif&role=in.(siswa,guru)&limit=1000&offset=${offset}`,
+      {
+        headers: {
+          apikey: LMS_SERVICE,
+          Authorization: `Bearer ${LMS_SERVICE}`,
+          'Accept-Profile': 'public',
+        },
+      },
+    );
+    if (!res.ok) {
+      console.error('baca total pemilih gagal', res.status, await res.text());
+      return null;
+    }
+    const page = await res.json();
+    rows.push(...page);
+    if (page.length < 1000) break;
+  }
+
+  const totals = { siswa: 0, guru: 0, classes: {} };
+  for (const row of rows) {
+    if (row.role === 'guru') {
+      totals.guru += 1;
+    } else {
+      totals.siswa += 1;
+      if (row.kelas) totals.classes[row.kelas] = (totals.classes[row.kelas] || 0) + 1;
+    }
+  }
+
+  eligibleCache = { at: Date.now(), value: totals };
+  return totals;
+}
+
+function percentOf(value, total) {
+  if (!total || total <= 0) return null;
+  return (value / total) * 100;
+}
+
+function summarize(candidates, votes, totals) {
+  const counts = new Map(candidates.map((candidate) => [candidate.no_urut, 0]));
+  const classVotes = new Map();
+  let picks = 0;
+  let siswaVoted = 0;
+  let guruVoted = 0;
+
+  for (const vote of votes) {
+    const nos = Array.isArray(vote.candidate_nos) ? vote.candidate_nos : [];
+    for (const no of nos) {
+      if (counts.has(no)) counts.set(no, counts.get(no) + 1);
+      picks += 1;
+    }
+
+    if (vote.voter_role === 'guru') {
+      guruVoted += 1;
+    } else {
+      siswaVoted += 1;
+      const kelas = String(vote.voter_kelas || '').trim();
+      if (kelas) classVotes.set(kelas, (classVotes.get(kelas) || 0) + 1);
+    }
+  }
+
+  const candidateRows = candidates
+    .map((candidate) => {
+      const count = counts.get(candidate.no_urut) || 0;
+      return {
+        no_urut: candidate.no_urut,
+        nama: candidate.nama,
+        kelas: candidate.kelas,
+        foto_url: candidate.foto_url,
+        votes: count,
+        percent: percentOf(count, picks),
+      };
+    })
+    .sort((a, b) => b.votes - a.votes || a.no_urut - b.no_urut);
+
+  const classNames = new Set(Object.keys(totals ? totals.classes : {}));
+  for (const kelas of classVotes.keys()) classNames.add(kelas);
+  const classes = [...classNames]
+    .sort((a, b) => a.localeCompare(b, 'id', { numeric: true }))
+    .map((kelas) => {
+      const voted = classVotes.get(kelas) || 0;
+      const total = totals ? totals.classes[kelas] || 0 : null;
+      return { kelas, voted, total, percent: percentOf(voted, total) };
+    });
+
+  return {
+    candidates: candidateRows,
+    picks,
+    voters: { siswa: siswaVoted, guru: guruVoted },
+    turnout: {
+      siswa: {
+        voted: siswaVoted,
+        total: totals ? totals.siswa : null,
+        percent: percentOf(siswaVoted, totals ? totals.siswa : null),
+      },
+      guru: {
+        voted: guruVoted,
+        total: totals ? totals.guru : null,
+        percent: percentOf(guruVoted, totals ? totals.guru : null),
+      },
+      classes,
+    },
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function safeEqual(a, b) {
+  const left = Buffer.from(String(a || ''));
+  const right = Buffer.from(String(b || ''));
+  return left.length === right.length && crypto.timingSafeEqual(left, right);
+}
+
+async function pantau(req, res, body) {
+  if (!safeEqual(body.password, PANTAU_PASSWORD)) {
+    return json(res, 401, { error: 'Password salah.' });
+  }
+  const [candidates, votes, totals] = await Promise.all([
+    getCandidates(),
+    getVotes(),
+    getEligibleTotals(),
+  ]);
+  return json(res, 200, summarize(candidates, votes, totals));
 }
 
 function publicVoter(profile) {
@@ -286,6 +447,7 @@ async function handler(req, res) {
 
     if (req.method === 'POST') {
       const body = parseBody(req);
+      if (body.action === 'pantau') return await pantau(req, res, body);
       if (body.action === 'login') return await login(req, res, body);
       if (body.action === 'vote') return await vote(req, res, body);
       if (body.action === 'logout') {
@@ -306,3 +468,4 @@ async function handler(req, res) {
 module.exports = handler;
 module.exports.pickLimit = pickLimit;
 module.exports.validatePicks = validatePicks;
+module.exports.summarize = summarize;

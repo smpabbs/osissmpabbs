@@ -3,5 +3,8 @@
     "api/osis.js": {
       "regions": ["sin1"]
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/pantau", "destination": "/pantau/index.html" }
+  ]
 }
