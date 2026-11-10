@@ -100,7 +100,7 @@
           <div class="role-chip" id="roleChip"></div>
         </div>
 
-        <div class="candidate-list" id="candidateGrid"></div>
+        <div class="ballot-gallery" id="candidateGrid" role="group" aria-label="Kandidat"></div>
         <p class="form-error ballot-error" id="voteError" role="alert" hidden></p>
       </section>
 
@@ -130,6 +130,27 @@
       <span>SMP ABBS Surakarta</span>
     </footer>
   </div>
+
+  <dialog class="candidate-dialog" id="candidateDialog">
+    <div class="candidate-dialog-grid">
+      <div class="candidate-dialog-photo">
+        <img id="dialogPhoto" alt="">
+      </div>
+      <div class="candidate-dialog-content">
+        <p class="dialog-kicker">Calon Ketua OSIS</p>
+        <h2 class="dialog-name" id="dialogName"></h2>
+        <div class="dialog-section">
+          <span class="dialog-label">Visi</span>
+          <p class="visi-text" id="dialogVisi"></p>
+        </div>
+        <div class="dialog-section">
+          <span class="dialog-label">Misi</span>
+          <div id="dialogMisi"></div>
+        </div>
+      </div>
+      <button class="dialog-close" id="dialogClose" type="button" aria-label="Tutup">×</button>
+    </div>
+  </dialog>
 
   <div class="ballot-bar" id="ballotBar" hidden>
     <div class="ballot-bar-inner">

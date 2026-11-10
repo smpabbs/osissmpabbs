@@ -24,6 +24,7 @@
   function showView(name) {
     for (const [key, el] of Object.entries(views)) el.hidden = key !== name;
     $('ballotBar').hidden = name !== 'ballot';
+    document.body.classList.toggle('is-ballot', name === 'ballot');
     window.scrollTo(0, 0);
   }
 
@@ -171,15 +172,48 @@
     list.appendChild(li);
   }
 
+  function openCandidateDialog(no) {
+    const candidate = state.candidates.find((item) => item.no_urut === no);
+    if (!candidate) return;
+
+    const photo = $('dialogPhoto');
+    photo.src = candidate.foto_url || '';
+    photo.alt = `Foto ${candidate.nama}`;
+
+    $('dialogName').textContent = candidate.nama;
+    $('dialogVisi').textContent = candidate.visi || 'Visi belum tersedia.';
+
+    const misiBox = $('dialogMisi');
+    misiBox.replaceChildren();
+    const items = String(candidate.misi || '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (items.length) {
+      const list = document.createElement('ul');
+      list.className = 'misi-list';
+      for (const item of items) addMission(list, item);
+      misiBox.appendChild(list);
+    } else {
+      const missing = document.createElement('p');
+      missing.className = 'dialog-missing';
+      missing.textContent = 'Misi kandidat ini belum tersedia.';
+      misiBox.appendChild(missing);
+    }
+
+    $('candidateDialog').showModal();
+  }
+
   function renderCandidates() {
-    const grid = $('candidateGrid');
-    grid.replaceChildren();
+    const gallery = $('candidateGrid');
+    gallery.replaceChildren();
 
     if (!state.candidates.length) {
       const empty = document.createElement('p');
       empty.className = 'empty-state';
       empty.textContent = 'Belum ada kandidat aktif. Hubungi panitia pemilihan.';
-      grid.appendChild(empty);
+      gallery.appendChild(empty);
       return;
     }
 
@@ -193,42 +227,35 @@
       card.setAttribute('aria-label', `Pilih ${candidate.nama}`);
       card.style.setProperty('--i', String(index));
 
-      const photo = document.createElement('div');
-      photo.className = 'candidate-photo';
-
       const initials = document.createElement('span');
-      initials.className = 'photo-initials';
+      initials.className = 'candidate-initials';
       initials.textContent = initialsOf(candidate.nama);
       initials.setAttribute('aria-hidden', 'true');
-      photo.appendChild(initials);
+      card.appendChild(initials);
 
       if (candidate.foto_url) {
         const img = document.createElement('img');
+        img.className = 'candidate-photo';
         img.src = candidate.foto_url;
         img.alt = `Foto ${candidate.nama}`;
         img.loading = 'lazy';
         img.addEventListener('error', () => img.remove());
-        photo.appendChild(img);
+        card.appendChild(img);
       }
 
       const number = document.createElement('span');
       number.className = 'candidate-no';
       number.textContent = String(candidate.no_urut).padStart(2, '0');
-      photo.appendChild(number);
+      card.appendChild(number);
 
       const check = document.createElement('span');
       check.className = 'candidate-check';
       check.setAttribute('aria-hidden', 'true');
-      check.innerHTML =
-        '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" ' +
-        'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
-      photo.appendChild(check);
+      check.textContent = '✓';
+      card.appendChild(check);
 
-      const body = document.createElement('div');
-      body.className = 'candidate-body';
-
-      const head = document.createElement('div');
-      head.className = 'candidate-head';
+      const info = document.createElement('div');
+      info.className = 'candidate-info';
 
       const name = document.createElement('h3');
       name.className = 'candidate-name';
@@ -238,63 +265,28 @@
       sub.className = 'candidate-sub';
       sub.textContent = candidate.kelas || 'Calon Ketua OSIS';
 
-      head.append(name, sub);
-      body.appendChild(head);
-
-      const details = document.createElement('div');
+      const details = document.createElement('button');
+      details.type = 'button';
       details.className = 'candidate-details';
+      details.textContent = 'Visi & Misi';
+      details.addEventListener('click', (event) => {
+        event.stopPropagation();
+        openCandidateDialog(candidate.no_urut);
+      });
 
-      if (candidate.visi || candidate.misi) {
-        if (candidate.visi) {
-          const block = document.createElement('div');
-          block.className = 'detail-block';
-          const label = document.createElement('span');
-          label.className = 'label';
-          label.textContent = 'Visi';
-          const text = document.createElement('p');
-          text.className = 'visi-text';
-          text.textContent = candidate.visi;
-          block.append(label, text);
-          details.appendChild(block);
-        }
-
-        if (candidate.misi) {
-          const block = document.createElement('div');
-          block.className = 'detail-block';
-          const label = document.createElement('span');
-          label.className = 'label';
-          label.textContent = 'Misi';
-          const list = document.createElement('ul');
-          list.className = 'misi-list';
-
-          const items = String(candidate.misi)
-            .split(/\r?\n/)
-            .map((line) => line.trim())
-            .filter(Boolean);
-
-          for (const item of items) addMission(list, item);
-          block.append(label, list);
-          details.appendChild(block);
-        }
-      } else {
-        const missing = document.createElement('p');
-        missing.className = 'detail-missing';
-        missing.textContent = 'Visi & misi kandidat ini belum tersedia.';
-        details.appendChild(missing);
-      }
-
-      body.appendChild(details);
-      card.append(photo, body);
+      info.append(name, sub, details);
+      card.appendChild(info);
 
       card.addEventListener('click', () => toggle(candidate.no_urut));
       card.addEventListener('keydown', (event) => {
+        if (event.target !== card) return;
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
           toggle(candidate.no_urut);
         }
       });
 
-      grid.appendChild(card);
+      gallery.appendChild(card);
     });
   }
 
@@ -448,6 +440,11 @@
   $('loginForm').addEventListener('submit', handleLogin);
   $('voteBtn').addEventListener('click', handleVote);
   $('doneBtn').addEventListener('click', () => finishSession('Sesi berakhir. Silakan masuk untuk pemilih berikutnya.'));
+
+  $('dialogClose').addEventListener('click', () => $('candidateDialog').close());
+  $('candidateDialog').addEventListener('click', (event) => {
+    if (event.target === $('candidateDialog')) $('candidateDialog').close();
+  });
 
   $('logoutBtn').addEventListener('click', () => {
     if (state.submitting) return;
