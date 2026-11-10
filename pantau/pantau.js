@@ -44,9 +44,30 @@
     return img;
   }
 
-  function renderPodium(candidates) {
+  function renderPodium(candidates, started) {
     const box = $('podium');
     box.replaceChildren();
+
+    if (!candidates.length) {
+      box.appendChild(el('p', 'empty-state', 'Belum ada kandidat aktif.'));
+      return;
+    }
+
+    // Belum ada suara: tampil rata tanpa peringkat.
+    if (!started) {
+      for (const candidate of candidates) {
+        const card = el('article', 'podium-card flat');
+        card.append(
+          avatar(candidate, 'podium-photo'),
+          el('h3', 'podium-name', candidate.nama),
+          el('p', 'podium-percent', pctText(candidate.percent)),
+          el('p', 'podium-votes', '0 suara'),
+        );
+        box.appendChild(card);
+      }
+      return;
+    }
+
     // Urutan podium 5 besar: 4 · 2 · 1 · 3 · 5 (juara 1 di tengah, paling tinggi).
     const order = [
       candidates[3],
@@ -55,11 +76,6 @@
       candidates[2],
       candidates[4],
     ].filter(Boolean);
-
-    if (!order.length) {
-      box.appendChild(el('p', 'empty-state', 'Belum ada kandidat aktif.'));
-      return;
-    }
 
     for (const candidate of order) {
       const rank = candidates.indexOf(candidate) + 1;
@@ -75,9 +91,10 @@
     }
   }
 
-  function renderBars(candidates) {
+  function renderBars(candidates, started) {
     const list = $('barList');
     list.replaceChildren();
+    list.classList.toggle('is-flat', !started);
 
     candidates.forEach((candidate, index) => {
       const row = el('div', 'bar-row');
@@ -94,11 +111,8 @@
       track.appendChild(fill);
       main.append(head, track);
 
-      row.append(
-        el('span', 'bar-rank', String(index + 1)),
-        main,
-        el('span', 'bar-percent', pctText(candidate.percent)),
-      );
+      if (started) row.appendChild(el('span', 'bar-rank', String(index + 1)));
+      row.append(main, el('span', 'bar-percent', pctText(candidate.percent)));
       list.appendChild(row);
     });
   }
@@ -152,8 +166,10 @@
     $('gateView').hidden = true;
     $('dashboard').hidden = false;
 
-    renderPodium(data.candidates);
-    renderBars(data.candidates);
+    const started = data.picks > 0;
+    $('podiumNote').hidden = started;
+    renderPodium(data.candidates, started);
+    renderBars(data.candidates, started);
     $('turnoutCards').replaceChildren(
       turnoutCard('Siswa', data.turnout.siswa, 'mint'),
       turnoutCard('Guru', data.turnout.guru, 'gold'),

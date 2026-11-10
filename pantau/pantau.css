@@ -109,6 +109,12 @@
   color: var(--text);
 }
 
+.podium-note {
+  margin: 18px 0 -10px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 /* Podium */
 .podium {
   display: grid;
@@ -282,6 +288,10 @@
 
 .bar-row:last-child {
   border-bottom: 0;
+}
+
+.bar-list.is-flat .bar-row {
+  grid-template-columns: minmax(0, 1fr) 58px;
 }
 
 .bar-rank {
@@ -484,6 +494,10 @@
   .bar-row {
     grid-template-columns: 24px minmax(0, 1fr) 50px;
     gap: 9px;
+  }
+
+  .bar-list.is-flat .bar-row {
+    grid-template-columns: minmax(0, 1fr) 50px;
   }
 
   .class-row {
