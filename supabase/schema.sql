@@ -45,7 +45,7 @@ Meningkatkan Kreativitas dan Partisipasi Aktif Siswa — Mengadakan berbagai keg
 Mendorong terciptanya budaya saling menghormati antar siswa, guru, dan seluruh warga sekolah.
 Mendorong komunikasi terbuka antara siswa, guru, dan OSIS.
 Menjalankan program dengan prinsip berpikir matang dulu, kemudian bertindak.$misi$),
-  (3, 'Inas', null, '/assets/inas.jpeg',
+  (3, 'Fazila Inas Tasnim M.', null, '/assets/inas.jpeg',
    'Mewujudkan OSIS SMP ABBS Surakarta sebagai organisasi yang terbuka dalam mendengarkan suara siswa dan mendukung penuh pengembangan minat serta bakat siswa, seperti membaca, menulis, olahraga, seni, dan lainnya.',
    $misi$Kotak Aspirasi — Ide bisa disampaikan anonim.
 Forum Dengar Pendapat — Sebulan sekali.

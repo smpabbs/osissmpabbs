@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup A · Gallery — Pemilihan Ketua OSIS</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/mockups/mockups.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body class="a-page mock-page">
+  <header class="mock-top">
+    <div class="mock-top-left">
+      <a class="back" href="/mockups/index.html">← Semua mockup</a>
+      <span class="mock-tag">A · Gallery</span>
+      <div class="mock-title">
+        <h1>Pilih ketua OSIS</h1>
+        <p>Klik foto untuk memilih. Detail visi &amp; misi ada di tiap kartu.</p>
+      </div>
+    </div>
+    <div class="mock-controls">
+      <span class="mock-note">Mockup · suara tidak dikirim</span>
+      <div class="role-toggle" role="group" aria-label="Mode demo jumlah pilihan">
+        <button type="button" data-limit="1" aria-pressed="true">1 pilihan</button>
+        <button type="button" data-limit="2" aria-pressed="false">2 pilihan</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="a-grid" id="aGrid" role="group" aria-label="Kandidat"></div>
+
+  <footer class="mock-bar">
+    <p class="count"><strong id="aCount">0</strong>/<span id="aLimit">1</span> dipilih</p>
+    <button class="btn btn-gold" type="button" id="aSubmit" disabled>Kirim suara</button>
+  </footer>
+
+  <div class="toast" id="aToast" role="status" aria-live="polite"></div>
+
+  <dialog class="detail-dialog" id="aDialog">
+    <div class="detail-grid">
+      <div class="detail-photo"><img id="aDialogPhoto" alt=""></div>
+      <div class="detail-content">
+        <button class="detail-close" id="aClose" type="button" aria-label="Tutup">×</button>
+        <p class="kicker">Calon Ketua OSIS</p>
+        <h2 class="detail-name" id="aDialogName"></h2>
+        <div class="detail-section">
+          <span class="detail-label">Visi</span>
+          <p class="vision-text" id="aDialogVisi"></p>
+        </div>
+        <div class="detail-section">
+          <span class="detail-label">Misi</span>
+          <div id="aDialogMisi"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="/mockups/data.js"></script>
+  <script>
+    (() => {
+      const candidates = window.MOCK_CANDIDATES;
+      const grid = document.getElementById('aGrid');
+      const count = document.getElementById('aCount');
+      const limitEl = document.getElementById('aLimit');
+      const submit = document.getElementById('aSubmit');
+      const dialog = document.getElementById('aDialog');
+      let limit = 1;
+      let picks = [];
+      let toastTimer = null;
+
+      function toast(message) {
+        const el = document.getElementById('aToast');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+
+      function openDetail(no) {
+        const c = candidates.find((item) => item.no === no);
+        const photo = document.getElementById('aDialogPhoto');
+        photo.src = c.foto;
+        photo.alt = `Foto ${c.nama}`;
+        document.getElementById('aDialogName').textContent = c.nama;
+        document.getElementById('aDialogVisi').textContent = c.visi;
+        document.getElementById('aDialogMisi').replaceChildren(window.mockMissionList(c.misi));
+        dialog.showModal();
+      }
+
+      function update() {
+        count.textContent = String(picks.length);
+        limitEl.textContent = String(limit);
+        submit.disabled = picks.length !== limit;
+        for (const card of grid.querySelectorAll('.a-card')) {
+          const picked = picks.includes(Number(card.dataset.no));
+          card.classList.toggle('is-picked', picked);
+          card.setAttribute('aria-checked', picked ? 'true' : 'false');
+        }
+      }
+
+      function toggle(no) {
+        const index = picks.indexOf(no);
+        if (index > -1) {
+          picks.splice(index, 1);
+        } else if (picks.length < limit) {
+          picks.push(no);
+        } else if (limit === 1) {
+          picks = [no];
+        } else {
+          toast('Mode demo ini hanya untuk 2 pilihan. Batalkan salah satu dulu.');
+          return;
+        }
+        update();
+      }
+
+      function render() {
+        grid.replaceChildren();
+        for (const c of candidates) {
+          const card = document.createElement('article');
+          card.className = 'a-card';
+          card.dataset.no = String(c.no);
+          card.tabIndex = 0;
+          card.setAttribute('role', 'checkbox');
+          card.setAttribute('aria-checked', 'false');
+          card.setAttribute('aria-label', `Pilih ${c.nama}`);
+
+          const img = document.createElement('img');
+          img.src = c.foto;
+          img.alt = `Foto ${c.nama}`;
+          img.loading = 'lazy';
+
+          const no = document.createElement('span');
+          no.className = 'a-no';
+          no.textContent = String(c.no).padStart(2, '0');
+
+          const check = document.createElement('span');
+          check.className = 'a-check';
+          check.textContent = '✓';
+          check.setAttribute('aria-hidden', 'true');
+
+          const info = document.createElement('div');
+          info.className = 'a-info';
+          const name = document.createElement('p');
+          name.className = 'a-name';
+          name.textContent = c.nama;
+          const sub = document.createElement('p');
+          sub.className = 'a-sub';
+          sub.textContent = 'Calon Ketua OSIS';
+          const details = document.createElement('button');
+          details.type = 'button';
+          details.className = 'a-details';
+          details.textContent = 'Visi & Misi';
+          details.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openDetail(c.no);
+          });
+          info.append(name, sub, details);
+
+          card.append(img, no, check, info);
+          card.addEventListener('click', () => toggle(c.no));
+          card.addEventListener('keydown', (event) => {
+            if (event.target !== card) return;
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              toggle(c.no);
+            }
+          });
+          grid.appendChild(card);
+        }
+        update();
+      }
+
+      document.querySelectorAll('.role-toggle button').forEach((button) => {
+        button.addEventListener('click', () => {
+          limit = Number(button.dataset.limit);
+          picks = [];
+          document.querySelectorAll('.role-toggle button').forEach((item) => {
+            item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+          });
+          update();
+        });
+      });
+
+      document.getElementById('aClose').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      submit.addEventListener('click', () => {
+        if (picks.length === limit) toast('Mockup A — suara tidak dikirim.');
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

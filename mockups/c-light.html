@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup C · Light ballot — Pemilihan Ketua OSIS</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/mockups/mockups.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body class="c-page mock-page">
+  <header class="mock-top">
+    <div class="mock-top-left">
+      <a class="back" href="/mockups/index.html">← Semua mockup</a>
+      <span class="mock-tag">C · Light ballot</span>
+      <div class="mock-title">
+        <h1>Pilih ketua OSIS</h1>
+        <p>Geser kartu, baca visi &amp; misi di panel bawah, lalu pilih.</p>
+      </div>
+    </div>
+    <div class="mock-controls">
+      <span class="mock-note">Mockup · suara tidak dikirim</span>
+      <div class="role-toggle" role="group" aria-label="Mode demo jumlah pilihan">
+        <button type="button" data-limit="1" aria-pressed="true">1 pilihan</button>
+        <button type="button" data-limit="2" aria-pressed="false">2 pilihan</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="c-strip" id="cStrip" role="group" aria-label="Kandidat"></div>
+
+  <section class="c-detail" aria-live="polite">
+    <div class="c-photo"><img id="cPhoto" alt=""></div>
+    <div class="c-content">
+      <p class="kicker">Calon Ketua OSIS</p>
+      <h2 class="c-detail-name" id="cName"></h2>
+      <p class="c-detail-sub" id="cNo"></p>
+      <div class="c-scroll scroll-area">
+        <div class="b-block">
+          <span class="b-label">Visi</span>
+          <p class="vision-text" id="cVisi"></p>
+        </div>
+        <div class="b-block">
+          <span class="b-label">Misi</span>
+          <div id="cMisi"></div>
+        </div>
+      </div>
+      <button class="btn btn-green c-select" type="button" id="cSelect">Pilih kandidat ini</button>
+    </div>
+  </section>
+
+  <footer class="mock-bar">
+    <p class="count"><strong id="cCount">0</strong>/<span id="cLimit">1</span> dipilih</p>
+    <button class="btn btn-green" type="button" id="cSubmit" disabled>Kirim suara</button>
+  </footer>
+
+  <div class="toast" id="cToast" role="status" aria-live="polite"></div>
+
+  <script src="/mockups/data.js"></script>
+  <script>
+    (() => {
+      const candidates = window.MOCK_CANDIDATES;
+      const strip = document.getElementById('cStrip');
+      const photo = document.getElementById('cPhoto');
+      const name = document.getElementById('cName');
+      const number = document.getElementById('cNo');
+      const visi = document.getElementById('cVisi');
+      const misi = document.getElementById('cMisi');
+      const select = document.getElementById('cSelect');
+      const count = document.getElementById('cCount');
+      const limitEl = document.getElementById('cLimit');
+      const submit = document.getElementById('cSubmit');
+      let limit = 1;
+      let picks = [];
+      let preview = 1;
+      let toastTimer = null;
+
+      function toast(message) {
+        const el = document.getElementById('cToast');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+
+      function renderStrip() {
+        strip.replaceChildren();
+        for (const c of candidates) {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'c-card';
+          card.dataset.no = String(c.no);
+          card.setAttribute('aria-label', `Lihat ${c.nama}`);
+
+          const img = document.createElement('img');
+          img.src = c.foto;
+          img.alt = `Foto ${c.nama}`;
+          img.loading = 'lazy';
+
+          const check = document.createElement('span');
+          check.className = 'c-check';
+          check.textContent = '✓';
+          check.setAttribute('aria-hidden', 'true');
+
+          const meta = document.createElement('span');
+          meta.className = 'c-meta';
+          const cardName = document.createElement('span');
+          cardName.className = 'c-name';
+          cardName.textContent = c.nama;
+          const no = document.createElement('span');
+          no.className = 'c-no';
+          no.textContent = String(c.no).padStart(2, '0');
+          meta.append(cardName, no);
+
+          card.append(img, check, meta);
+          card.addEventListener('click', () => {
+            preview = c.no;
+            update();
+          });
+          strip.appendChild(card);
+        }
+      }
+
+      function renderPreview() {
+        const c = candidates.find((item) => item.no === preview);
+        photo.src = c.foto;
+        photo.alt = `Foto ${c.nama}`;
+        name.textContent = c.nama;
+        number.textContent = `Nomor ${String(c.no).padStart(2, '0')}`;
+        visi.textContent = c.visi;
+        misi.replaceChildren(window.mockMissionList(c.misi));
+      }
+
+      function update() {
+        count.textContent = String(picks.length);
+        limitEl.textContent = String(limit);
+        submit.disabled = picks.length !== limit;
+
+        for (const card of strip.querySelectorAll('.c-card')) {
+          const no = Number(card.dataset.no);
+          card.classList.toggle('is-preview', no === preview);
+          card.classList.toggle('is-picked', picks.includes(no));
+          card.setAttribute('aria-current', no === preview ? 'true' : 'false');
+        }
+
+        const picked = picks.includes(preview);
+        if (picked) {
+          select.textContent = 'Batalkan pilihan';
+          select.disabled = false;
+        } else if (picks.length >= limit) {
+          select.textContent = 'Batalkan salah satu dulu';
+          select.disabled = true;
+        } else {
+          select.textContent = 'Pilih kandidat ini';
+          select.disabled = false;
+        }
+
+        renderPreview();
+      }
+
+      select.addEventListener('click', () => {
+        const index = picks.indexOf(preview);
+        if (index > -1) {
+          picks.splice(index, 1);
+        } else if (picks.length < limit) {
+          picks.push(preview);
+        } else {
+          toast(`Mode demo ini hanya untuk ${limit} pilihan.`);
+          return;
+        }
+        update();
+      });
+
+      document.querySelectorAll('.role-toggle button').forEach((button) => {
+        button.addEventListener('click', () => {
+          limit = Number(button.dataset.limit);
+          picks = [];
+          document.querySelectorAll('.role-toggle button').forEach((item) => {
+            item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+          });
+          update();
+        });
+      });
+
+      submit.addEventListener('click', () => {
+        if (picks.length === limit) toast('Mockup C — suara tidak dikirim.');
+      });
+
+      renderStrip();
+      update();
+    })();
+  </script>
+</body>
+</html>

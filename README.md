@@ -102,7 +102,7 @@ npm test
 
 ## Mengganti data kandidat
 
-Semua data ada di project suara → **Table Editor → `osis_candidates`**. Foto dan visi/misi seluruh kandidat sudah terisi. Nama lengkap **Inas** belum tercantum di file; sementara ditampilkan sebagai "Inas".
+Semua data ada di project suara → **Table Editor → `osis_candidates`**. Foto dan visi/misi seluruh kandidat sudah terisi. Nama lengkap kandidat 3: **Fazila Inas Tasnim M.**
 
 Lewat SQL Editor:
 
@@ -166,7 +166,7 @@ Setelah itu semua akun bisa memilih lagi.
 
 ## Catatan
 
-- Foto dan visi/misi seluruh kandidat sudah terisi. Nama lengkap Inas masih menunggu data dari panitia.
+- Foto dan visi/misi seluruh kandidat sudah terisi.
 - Halaman login tidak menampilkan aturan jumlah pilihan. Setelah login, jumlah yang harus dipilih hanya terlihat dari indikator progres di bilik suara.
 - Pemilih melihat halaman login secara publik, tetapi hanya akun LMS SMP ABBS yang aktif yang bisa masuk dan memilih.
 - Belum ada halaman admin/rekap di situs; rekap diambil lewat SQL di atas.
