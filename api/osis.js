@@ -20,6 +20,121 @@ const PANTAU_PASSWORD = process.env.PANTAU_PASSWORD || 'osis2627';
 // no_urut database tidak diubah supaya suara yang sudah masuk tetap valid.
 const TAMPIL_URUT = [1, 2, 5, 4, 3];
 
+// Daftar induk guru & tendik SMP ABBS Surakarta untuk rekap partisipasi di /pantau.
+const GURU_MASTER = [
+  'Adila Rahmah, S.Pd., M.Pd.',
+  'Ahmad Bayu Abdulloh, S.Ag.',
+  'Alla Junia Nurdin, M.Kom',
+  'Amien Nur Wicaksono, S.Ag',
+  'Andi wijayanto, S.Pd',
+  'Arif Hidayat, M.Pd',
+  'Arvino Nurvieri Kusuma, S.Pd',
+  'Asnia Novitasari, AM, M.E',
+  'Aulia Qisthi Rosyada, S.Pd.',
+  'Binti Qoeroti, S.Pd., M.Si',
+  'Charlieta Nova Putri Fedito, S.Kom',
+  'Daffa Danendra Rizqi Nugraha, S.Pd.',
+  'Danang Dwi Pambudi, S. Pd',
+  'Fadlan Rifai AL-Irsyad',
+  'Farida Nur Hidayati,S.Pd',
+  'Fatma Roudhotul Rafida Kolis, S.Pd',
+  'Febri Cahya Syahputra, S.Pd., M.Pd.',
+  'Fitri Nur Kolifah, S.Pd.',
+  'Hang Sakti Abdullah, S.Pd.',
+  'Hari Rohmah, S.Pd',
+  'Ida Aryani,S.Sos',
+  'Ifan Destya Adi Tama, S.Pd.',
+  'Iin Indah Saputri, S.Pd.',
+  'Isti Qomah Nurul Izzati, S.Pd.',
+  'Joko Ariyanto, S.T.',
+  'Muamar Fariq Salafy, S.Pd, Gr.',
+  'Muhammad Fahmi Aziz, S.Psi',
+  'Muhammad Jauhari Ahmad',
+  'Muhammad Syafiq, S.Pd.',
+  'Musfiq Amrulloh, S.Pd.',
+  'Nur Rohmah Hidayanti',
+  'Ramadanti Prativi,S.Pd.,M.Pd',
+  'Scundy Nourma Pratiwi, S.Pd., M.Pd',
+  'Sharih Shadri, S.S.',
+  'Sinta Fitriana, S.Pd',
+  'Siti Asiyah W.J. S,Pd.',
+  'Siti Khoimah, S. Pd.',
+  'Siti Robiatul Adawiyah, S.Si',
+  'Siti Sirril Inayah',
+  'Siti Zamronah Rizqiah, S.Pd.',
+  'Syahrul Abdi Narotama',
+  'Syarah Karina Putri, S.Pd',
+  'Tri Wijayanti, S.Pd., M.Pd',
+  'Wafda Salsabila,S.Pd',
+  'Yoki Wirawan, S.Pd',
+  'Yona Puspa Ningtias, S.Pd.',
+];
+
+function normGuru(name) {
+  if (!name) return '';
+  return String(name)
+    .toLowerCase()
+    .replace(/[\.,]/g, ' ')
+    .replace(
+      /\b(s\s*pd|m\s*pd|s\s*si|m\s*si|s\s*kom|m\s*kom|m\s*e|s\s*t|st|gr|s\s*sos|sos|s\s*ag|s\s*psi|s\s*s|am)\b/g,
+      '',
+    )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function matchGuru(masterList, guruVotes) {
+  const list = Array.isArray(masterList) && masterList.length ? masterList : GURU_MASTER;
+  const matchedVoteIndices = new Set();
+  const sudah = [];
+  const belum = [];
+
+  for (const masterName of list) {
+    const cm = normGuru(masterName);
+    let matchedVote = null;
+
+    for (let i = 0; i < guruVotes.length; i++) {
+      if (matchedVoteIndices.has(i)) continue;
+      const cv = normGuru(guruVotes[i].voter_nama);
+      if (cm === cv || (cm.length >= 6 && (cm.includes(cv) || cv.includes(cm)))) {
+        matchedVote = guruVotes[i];
+        matchedVoteIndices.add(i);
+        break;
+      }
+    }
+
+    if (matchedVote) {
+      sudah.push({
+        nama: matchedVote.voter_nama || masterName,
+        master_nama: masterName,
+        waktu: matchedVote.created_at || null,
+      });
+    } else {
+      belum.push({
+        nama: masterName,
+      });
+    }
+  }
+
+  for (let i = 0; i < guruVotes.length; i++) {
+    if (!matchedVoteIndices.has(i)) {
+      sudah.push({
+        nama: guruVotes[i].voter_nama || 'Guru',
+        master_nama: guruVotes[i].voter_nama,
+        waktu: guruVotes[i].created_at || null,
+      });
+    }
+  }
+
+  sudah.sort((a, b) => {
+    if (a.waktu && b.waktu) return new Date(b.waktu) - new Date(a.waktu);
+    return a.nama.localeCompare(b.nama, 'id');
+  });
+  belum.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
+
+  return { sudah, belum };
+}
+
 function urutTampil(candidates) {
   const posisi = new Map(TAMPIL_URUT.map((no, i) => [no, i]));
   return [...candidates].sort(
@@ -149,7 +264,7 @@ async function getVotes() {
   const rows = [];
   for (let offset = 0; ; offset += 1000) {
     const res = await fetch(
-      `${VOTE_URL}/rest/v1/osis_votes?select=candidate_nos,voter_role,voter_kelas&limit=1000&offset=${offset}`,
+      `${VOTE_URL}/rest/v1/osis_votes?select=candidate_nos,voter_role,voter_kelas,voter_nama,created_at&limit=1000&offset=${offset}`,
       {
         headers: {
           apikey: VOTE_KEY,
@@ -215,9 +330,10 @@ function percentOf(value, total) {
   return (value / total) * 100;
 }
 
-function summarize(candidates, votes, totals) {
+function summarize(candidates, votes, totals, guruMaster = GURU_MASTER) {
   const counts = new Map(candidates.map((candidate) => [candidate.no_urut, 0]));
   const classVotes = new Map();
+  const guruVotes = [];
   let picks = 0;
   let siswaVoted = 0;
   let guruVoted = 0;
@@ -232,6 +348,7 @@ function summarize(candidates, votes, totals) {
 
     if (vote.voter_role === 'guru') {
       guruVoted += 1;
+      guruVotes.push(vote);
     } else {
       siswaVoted += 1;
       const kelas = String(vote.voter_kelas || '').trim();
@@ -263,6 +380,14 @@ function summarize(candidates, votes, totals) {
       return { kelas, voted, total, percent: percentOf(voted, total) };
     });
 
+  const rekapGuru = matchGuru(guruMaster, guruVotes);
+  const guruTotal =
+    totals && totals.guru != null
+      ? totals.guru
+      : guruMaster
+        ? guruMaster.length
+        : null;
+
   return {
     candidates: candidateRows,
     picks,
@@ -275,11 +400,12 @@ function summarize(candidates, votes, totals) {
       },
       guru: {
         voted: guruVoted,
-        total: totals ? totals.guru : null,
-        percent: percentOf(guruVoted, totals ? totals.guru : null),
+        total: guruTotal,
+        percent: percentOf(guruVoted, guruTotal),
       },
       classes,
     },
+    guru: rekapGuru,
     updated_at: new Date().toISOString(),
   };
 }
@@ -487,3 +613,6 @@ module.exports.pickLimit = pickLimit;
 module.exports.validatePicks = validatePicks;
 module.exports.summarize = summarize;
 module.exports.urutTampil = urutTampil;
+module.exports.GURU_MASTER = GURU_MASTER;
+module.exports.normGuru = normGuru;
+module.exports.matchGuru = matchGuru;

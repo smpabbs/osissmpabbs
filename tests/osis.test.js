@@ -105,3 +105,23 @@ test('suara guru berbobot 2, suara siswa berbobot 1', () => {
   assert.equal(byNo.get(2).percent, (2 / 3) * 100);
   assert.deepEqual(result.voters, { siswa: 1, guru: 1 });
 });
+
+test('rekap guru memisahkan guru yang sudah dan belum memilih dengan akurat', () => {
+  const { matchGuru } = require('../api/osis.js');
+  const master = [
+    'Arif Hidayat, M.Pd',
+    'Adila Rahmah, S.Pd., M.Pd.',
+    'Binti Qoeroti, S.Pd., M.Si',
+  ];
+  const votes = [
+    { voter_nama: 'Arif Hidayat, M.Pd', created_at: '2026-11-11T04:00:00Z' },
+    { voter_nama: 'Adila Rahmah, M.Pd', created_at: '2026-11-11T05:00:00Z' },
+  ];
+
+  const rekap = matchGuru(master, votes);
+  assert.equal(rekap.sudah.length, 2);
+  assert.equal(rekap.belum.length, 1);
+  assert.equal(rekap.sudah[0].nama, 'Adila Rahmah, M.Pd'); // terbaru duluan
+  assert.equal(rekap.sudah[1].nama, 'Arif Hidayat, M.Pd');
+  assert.equal(rekap.belum[0].nama, 'Binti Qoeroti, S.Pd., M.Si');
+});

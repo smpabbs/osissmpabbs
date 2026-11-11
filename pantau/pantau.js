@@ -9,6 +9,8 @@
   let password = '';
   let timer = null;
   let busy = false;
+  let currentGuru = null;
+  let activeGuruTab = 'sudah';
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -162,6 +164,62 @@
     }
   }
 
+  function renderGuru(guru) {
+    if (!guru) return;
+    currentGuru = guru;
+
+    const sudah = guru.sudah || [];
+    const belum = guru.belum || [];
+
+    const countSudah = $('countGuruSudah');
+    const countBelum = $('countGuruBelum');
+    if (countSudah) countSudah.textContent = number.format(sudah.length);
+    if (countBelum) countBelum.textContent = number.format(belum.length);
+
+    const list = $('guruList');
+    if (!list) return;
+    list.replaceChildren();
+
+    const isSudah = activeGuruTab === 'sudah';
+    const items = isSudah ? sudah : belum;
+
+    if (!items.length) {
+      list.appendChild(
+        el(
+          'p',
+          'empty-state',
+          isSudah ? 'Belum ada guru yang memilih.' : 'Semua guru sudah memilih.',
+        ),
+      );
+      return;
+    }
+
+    items.forEach((item, index) => {
+      const row = el('div', `guru-row is-${activeGuruTab}`);
+      const num = el('span', 'guru-num', String(index + 1));
+      const info = el('div', 'guru-info');
+      const name = el('span', 'guru-name', item.nama);
+      info.appendChild(name);
+
+      const badgeWrap = el('div', 'guru-badge-wrap');
+      if (isSudah) {
+        badgeWrap.appendChild(el('span', 'guru-badge badge-sudah', '✓ Sudah'));
+        if (item.waktu) {
+          const time = new Date(item.waktu).toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          badgeWrap.appendChild(el('span', 'guru-time', `${time} WIB`));
+        }
+      } else {
+        badgeWrap.appendChild(el('span', 'guru-badge badge-belum', 'Belum'));
+      }
+
+      row.append(num, info, badgeWrap);
+      list.appendChild(row);
+    });
+  }
+
   function render(data) {
     $('gateView').hidden = true;
     $('dashboard').hidden = false;
@@ -175,6 +233,7 @@
       turnoutCard('Guru', data.turnout.guru, 'gold'),
     );
     renderClasses(data.turnout.classes);
+    renderGuru(data.guru);
 
     $('totalPicks').textContent = number.format(data.picks);
     $('totalVoters').textContent = number.format(data.voters.siswa + data.voters.guru);
@@ -293,6 +352,25 @@
     render(result.data);
     startPolling();
   }
+
+  const tabSudah = $('tabGuruSudah');
+  const tabBelum = $('tabGuruBelum');
+
+  function setGuruTab(tab) {
+    activeGuruTab = tab;
+    if (tabSudah) {
+      tabSudah.classList.toggle('is-active', tab === 'sudah');
+      tabSudah.setAttribute('aria-selected', String(tab === 'sudah'));
+    }
+    if (tabBelum) {
+      tabBelum.classList.toggle('is-active', tab === 'belum');
+      tabBelum.setAttribute('aria-selected', String(tab === 'belum'));
+    }
+    if (currentGuru) renderGuru(currentGuru);
+  }
+
+  if (tabSudah) tabSudah.addEventListener('click', () => setGuruTab('sudah'));
+  if (tabBelum) tabBelum.addEventListener('click', () => setGuruTab('belum'));
 
   $('gateForm').addEventListener('submit', handleGate);
 

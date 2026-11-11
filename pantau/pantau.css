@@ -442,6 +442,139 @@
   text-align: right;
 }
 
+/* Panel Rekap Partisipasi Guru */
+.guru-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.guru-head h2 {
+  margin: 0;
+}
+
+.panel-subtitle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 4px 0 0;
+}
+
+.tab-pills {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.tab-pill {
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tab-pill:hover {
+  color: var(--text);
+}
+
+.tab-pill.is-active {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.guru-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.guru-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  transition: border-color 0.18s, background 0.18s;
+}
+
+.guru-row:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+
+.guru-num {
+  width: 22px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.guru-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.guru-name {
+  display: block;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guru-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.guru-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.guru-badge.badge-sudah {
+  background: rgba(142, 230, 193, 0.14);
+  color: var(--mint);
+  border: 1px solid rgba(142, 230, 193, 0.35);
+}
+
+.guru-badge.badge-belum {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+}
+
+.guru-time {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
 @media (max-width: 760px) {
   .podium {
     grid-template-columns: 1fr 1fr;
@@ -482,6 +615,24 @@
   }
 
   .turnout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guru-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tab-pills {
+    width: 100%;
+  }
+
+  .tab-pill {
+    flex: 1;
+    text-align: center;
+  }
+
+  .guru-list {
     grid-template-columns: 1fr;
   }
 }

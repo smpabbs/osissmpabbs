@@ -77,6 +77,24 @@
             <div class="class-list" id="classList"></div>
           </section>
         </div>
+
+        <section class="panel guru-panel" id="guruPanel">
+          <div class="guru-head">
+            <div>
+              <h2>Partisipasi Guru</h2>
+              <p class="panel-subtitle">Daftar guru yang sudah dan belum memberikan suara</p>
+            </div>
+            <div class="tab-pills" role="tablist" aria-label="Status Partisipasi Guru">
+              <button class="tab-pill is-active" id="tabGuruSudah" type="button" role="tab" aria-selected="true">
+                Sudah (<span id="countGuruSudah">0</span>)
+              </button>
+              <button class="tab-pill" id="tabGuruBelum" type="button" role="tab" aria-selected="false">
+                Belum (<span id="countGuruBelum">0</span>)
+              </button>
+            </div>
+          </div>
+          <div class="guru-list" id="guruList"></div>
+        </section>
       </section>
     </main>
 
