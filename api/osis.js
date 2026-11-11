@@ -16,6 +16,17 @@ const SESSION_MAX_AGE = 3600;
 // shortcut: default di kode, ganti lewat env PANTAU_PASSWORD bila perlu.
 const PANTAU_PASSWORD = process.env.PANTAU_PASSWORD || 'osis2627';
 
+// Urutan tampil kartu di bilik suara. Nomor di kartu = posisi di daftar ini;
+// no_urut database tidak diubah supaya suara yang sudah masuk tetap valid.
+const TAMPIL_URUT = [1, 2, 5, 4, 3];
+
+function urutTampil(candidates) {
+  const posisi = new Map(TAMPIL_URUT.map((no, i) => [no, i]));
+  return [...candidates].sort(
+    (a, b) => (posisi.get(a.no_urut) ?? 99) - (posisi.get(b.no_urut) ?? 99),
+  );
+}
+
 function pickLimit(role) {
   return role === 'siswa' ? 1 : 2;
 }
@@ -363,7 +374,7 @@ async function login(req, res, body) {
 
   return json(res, 200, {
     voter: publicVoter(voter.voter),
-    candidates: await getCandidates(),
+    candidates: urutTampil(await getCandidates()),
     voted,
   });
 }
@@ -380,7 +391,7 @@ async function session(req, res) {
 
   return json(res, 200, {
     voter: publicVoter(voter.voter),
-    candidates: await getCandidates(),
+    candidates: urutTampil(await getCandidates()),
     voted: await hasVoted(user.id),
   });
 }
@@ -469,3 +480,4 @@ module.exports = handler;
 module.exports.pickLimit = pickLimit;
 module.exports.validatePicks = validatePicks;
 module.exports.summarize = summarize;
+module.exports.urutTampil = urutTampil;

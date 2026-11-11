@@ -245,7 +245,7 @@
 
       const number = document.createElement('span');
       number.className = 'candidate-no';
-      number.textContent = String(candidate.no_urut).padStart(2, '0');
+      number.textContent = String(index + 1).padStart(2, '0');
       card.appendChild(number);
 
       const check = document.createElement('span');

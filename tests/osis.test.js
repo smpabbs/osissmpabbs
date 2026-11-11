@@ -85,3 +85,12 @@ test('pantau tetap menghitung suara saat total pemilih belum tersedia', () => {
   assert.equal(result.turnout.classes[0].percent, null);
 });
 
+test('urutan tampil bilik suara mengikuti TAMPIL_URUT, bukan no_urut', () => {
+  const { urutTampil } = require('../api/osis.js');
+  const names = { 1: 'Ahmaddin', 2: 'Faruq', 3: 'Inas', 4: 'Kirana', 5: 'Kuni' };
+  const input = [5, 3, 1, 4, 2].map((no) => ({ no_urut: no, nama: names[no] }));
+  assert.deepEqual(
+    urutTampil(input).map((c) => c.nama),
+    ['Ahmaddin', 'Faruq', 'Kuni', 'Kirana', 'Inas'],
+  );
+});
