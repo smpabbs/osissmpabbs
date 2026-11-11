@@ -21,9 +21,7 @@ create table if not exists public.osis_votes (
   voter_kelas   text,
   candidate_nos integer[] not null,
   created_at    timestamptz not null default now(),
-  constraint osis_votes_jumlah_suara check (
-    cardinality(candidate_nos) = case voter_role when 'siswa' then 1 else 2 end
-  )
+  constraint osis_votes_jumlah_suara check (cardinality(candidate_nos) = 1)
 );
 
 alter table public.osis_candidates enable row level security;

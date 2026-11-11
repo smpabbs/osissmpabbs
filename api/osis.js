@@ -27,8 +27,13 @@ function urutTampil(candidates) {
   );
 }
 
-function pickLimit(role) {
-  return role === 'siswa' ? 1 : 2;
+// Semua pemilih memilih 1 kandidat. Suara guru dihitung berbobot 2.
+function pickLimit() {
+  return 1;
+}
+
+function voteWeight(role) {
+  return role === 'guru' ? 2 : 1;
 }
 
 function validatePicks(role, picks, validNos) {
@@ -36,8 +41,8 @@ function validatePicks(role, picks, validNos) {
   const nums = picks.map(Number);
   if (nums.some((n) => !Number.isInteger(n))) return 'Pilihan tidak valid.';
   if (new Set(nums).size !== nums.length) return 'Kandidat tidak boleh dipilih dua kali.';
-  if (nums.length !== pickLimit(role)) {
-    return role === 'siswa' ? 'Pilih tepat 1 kandidat.' : 'Pilih tepat 2 kandidat.';
+  if (nums.length !== pickLimit()) {
+    return 'Pilih tepat 1 kandidat.';
   }
   if (!nums.every((n) => validNos.includes(n))) return 'Kandidat tidak ditemukan.';
   return null;
@@ -219,9 +224,10 @@ function summarize(candidates, votes, totals) {
 
   for (const vote of votes) {
     const nos = Array.isArray(vote.candidate_nos) ? vote.candidate_nos : [];
+    const weight = voteWeight(vote.voter_role);
     for (const no of nos) {
-      if (counts.has(no)) counts.set(no, counts.get(no) + 1);
-      picks += 1;
+      if (counts.has(no)) counts.set(no, counts.get(no) + weight);
+      picks += weight;
     }
 
     if (vote.voter_role === 'guru') {

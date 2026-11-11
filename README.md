@@ -134,7 +134,7 @@ Bila `foto_url` kosong atau gambar gagal dimuat, kartu menampilkan inisial nama.
 Halaman panitia: buka `/pantau` (mis. `https://osissmpabbs.vercel.app/pantau`), lalu masukkan password panitia. Halaman menampilkan podium 5 kandidat, persentase perolehan suara, dan partisipasi pemilih per kelas serta guru. Data diperbarui otomatis setiap 5 detik.
 
 - Password diatur lewat env `PANTAU_PASSWORD`; bila env kosong dipakai `osis2627`.
-- Persentase kandidat dihitung dari seluruh pilihan yang masuk: siswa 1 pilihan, guru 2 pilihan. Jumlah persentase seluruh kandidat = 100% dari semua pilihan.
+- Persentase kandidat dihitung dari seluruh suara berbobot: siswa 1 suara, guru 2 suara. Setiap pemilih tetap memilih 1 kandidat. Jumlah persentase seluruh kandidat = 100% dari semua suara.
 - Persentase partisipasi per kelas dan guru memerlukan env `LMS_SUPABASE_SERVICE_KEY` (service_role project LMS). Tanpa env itu, halaman tetap menampilkan jumlah suara yang sudah masuk, tetapi total pemilih dan persentasenya tampil "—".
 - Halaman ini tidak ditautkan dari bilik suara dan diberi `noindex`. Jangan bagikan URL/password ke siswa.
 
@@ -157,7 +157,7 @@ group by voter_role;
 ## Keamanan & aturan
 
 - RLS aktif di `osis_candidates` dan `osis_votes`; `anon`/`authenticated` tidak punya akses langsung. Hanya function server (service role) yang bisa membaca/menulis. **Jangan matikan RLS.**
-- `osis_votes.voter_id` adalah primary key → satu akun satu baris. Constraint database memaksa jumlah pilihan sesuai role.
+- `osis_votes.voter_id` adalah primary key → satu akun satu baris. Constraint database memaksa tepat 1 pilihan per akun; bobot suara guru (2) dihitung saat rekap.
 - Pilihan tidak ditampilkan di situs. Panitia tetap bisa melihat `voter_id`/nama/NIS di tabel untuk audit dan mencegah double-vote — ini bukan surat suara anonim.
 - Server memverifikasi ulang role, sekolah, dan status akun setiap kali vote — bukan hanya mengandalkan data dari browser.
 - Cookie sesi berumur 1 jam, `HttpOnly`, `SameSite=Lax`, dan `Secure` di HTTPS. Tombol **Keluar** menghapus sesi; cookie juga dihapus otomatis setelah suara terkirim, dan layar terima kasih kembali ke login setelah 6 detik.

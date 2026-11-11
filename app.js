@@ -29,7 +29,7 @@
   }
 
   function pickLimit() {
-    return state.voter && state.voter.role === 'siswa' ? 1 : 2;
+    return 1;
   }
 
   async function api(method, body) {
@@ -335,7 +335,9 @@
     $('voterName').textContent = firstName(voter.nama);
     $('roleChip').textContent = roleLabel(voter);
     $('ballotInstruction').textContent =
-      'Pilih kandidat yang menurutmu paling tepat. Pilihan tidak bisa diubah setelah dikirim.';
+      voter.role === 'guru'
+        ? 'Pilih satu kandidat. Suara guru dihitung berbobot dua. Pilihan tidak bisa diubah setelah dikirim.'
+        : 'Pilih kandidat yang menurutmu paling tepat. Pilihan tidak bisa diubah setelah dikirim.';
 
     state.picks = [];
     renderCandidates();

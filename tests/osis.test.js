@@ -5,18 +5,14 @@ const { pickLimit, validatePicks, summarize } = require('../api/osis.js');
 
 const CANDIDATES = [1, 2, 3, 4, 5];
 
-test('siswa memilih tepat 1 kandidat', () => {
+test('semua peran memilih tepat 1 kandidat', () => {
   assert.equal(pickLimit('siswa'), 1);
+  assert.equal(pickLimit('guru'), 1);
   assert.equal(validatePicks('siswa', [2], CANDIDATES), null);
+  assert.equal(validatePicks('guru', [1], CANDIDATES), null);
+  assert.match(validatePicks('guru', [1, 2], CANDIDATES), /tepat 1/);
   assert.match(validatePicks('siswa', [], CANDIDATES), /tepat 1/);
   assert.match(validatePicks('siswa', [1, 2], CANDIDATES), /tepat 1/);
-});
-
-test('guru memilih tepat 2 kandidat', () => {
-  assert.equal(pickLimit('guru'), 2);
-  assert.equal(validatePicks('guru', [1, 4], CANDIDATES), null);
-  assert.match(validatePicks('guru', [1], CANDIDATES), /tepat 2/);
-  assert.match(validatePicks('guru', [1, 2, 3], CANDIDATES), /tepat 2/);
 });
 
 test('kandidat ganda ditolak', () => {
@@ -45,15 +41,15 @@ test('pantau menghitung persentase kandidat dari seluruh pilihan', () => {
     { voter_role: 'siswa', voter_kelas: '7A', candidate_nos: [1] },
     { voter_role: 'siswa', voter_kelas: '7B', candidate_nos: [2] },
     { voter_role: 'siswa', voter_kelas: '7A', candidate_nos: [1] },
-    { voter_role: 'guru', voter_kelas: null, candidate_nos: [1, 3] },
+    { voter_role: 'guru', voter_kelas: null, candidate_nos: [1] },
   ];
   const totals = { siswa: 10, guru: 5, classes: { '7A': 6, '7B': 4, '7C': 2 } };
   const result = summarize(PANTAU_CANDIDATES, votes, totals);
 
   assert.equal(result.picks, 5);
   assert.equal(result.candidates[0].no_urut, 1);
-  assert.equal(result.candidates[0].votes, 3);
-  assert.equal(result.candidates[0].percent, 60);
+  assert.equal(result.candidates[0].votes, 4);
+  assert.equal(result.candidates[0].percent, 80);
   assert.equal(result.candidates[1].no_urut, 2);
   assert.equal(result.candidates[1].votes, 1);
   assert.equal(result.candidates[4].votes, 0);
@@ -93,4 +89,19 @@ test('urutan tampil bilik suara mengikuti TAMPIL_URUT, bukan no_urut', () => {
     urutTampil(input).map((c) => c.nama),
     ['Ahmaddin', 'Faruq', 'Kuni', 'Kirana', 'Inas'],
   );
+});
+
+test('suara guru berbobot 2, suara siswa berbobot 1', () => {
+  const votes = [
+    { voter_role: 'siswa', voter_kelas: '7A', candidate_nos: [1] },
+    { voter_role: 'guru', voter_kelas: null, candidate_nos: [2] },
+  ];
+  const result = summarize(PANTAU_CANDIDATES, votes, null);
+
+  assert.equal(result.picks, 3);
+  const byNo = new Map(result.candidates.map((c) => [c.no_urut, c]));
+  assert.equal(byNo.get(1).votes, 1);
+  assert.equal(byNo.get(2).votes, 2);
+  assert.equal(byNo.get(2).percent, (2 / 3) * 100);
+  assert.deepEqual(result.voters, { siswa: 1, guru: 1 });
 });
