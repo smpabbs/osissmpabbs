@@ -254,13 +254,6 @@
   font-size: 0.8rem;
 }
 
-.podium-votes {
-  margin-top: 4px;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
 /* Panel umum */
 .panel {
   padding: clamp(16px, 2.5vw, 24px);

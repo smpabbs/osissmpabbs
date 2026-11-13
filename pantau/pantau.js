@@ -63,7 +63,6 @@
           avatar(candidate, 'podium-photo'),
           el('h3', 'podium-name', candidate.nama),
           el('p', 'podium-percent', pctText(candidate.percent)),
-          el('p', 'podium-votes', '0 suara'),
         );
         box.appendChild(card);
       }
@@ -87,7 +86,6 @@
         avatar(candidate, 'podium-photo'),
         el('h3', 'podium-name', candidate.nama),
         el('p', 'podium-percent', pctText(candidate.percent)),
-        el('p', 'podium-votes', `${number.format(candidate.votes)} suara`),
       );
       box.appendChild(card);
     }
