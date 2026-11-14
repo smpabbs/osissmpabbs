@@ -2,7 +2,7 @@ window.MOCK_CANDIDATES = [
   {
     no: 1,
     nama: 'Ahmaddin Haq',
-    foto: '/assets/ahmadin.jpeg',
+    foto: '../assets/ahmadin.jpeg',
     visi: 'Terwujudnya peserta didik yang berkarakter mulia, berprestasi, kreatif, inovatif, disiplin, mandiri, serta memiliki kepedulian dan tanggung jawab terhadap lingkungan.',
     misi: [
       'Menciptakan Lingkungan Sekolah yang Bersih, Rapi, dan Nyaman — Menumbuhkan kesadaran seluruh siswa untuk menjaga kebersihan dan kerapian lingkungan sekolah melalui aksi nyata serta program peduli lingkungan yang berkelanjutan.',
@@ -15,7 +15,7 @@ window.MOCK_CANDIDATES = [
   {
     no: 2,
     nama: 'Ammar Sakhi Al Faruq',
-    foto: '/assets/faruq.jpeg',
+    foto: '../assets/faruq.jpeg',
     visi: 'Mewujudkan lingkungan sekolah yang aman, nyaman, dan adil bagi seluruh murid, dengan komunikasi yang terbuka antara siswa, guru, dan OSIS.',
     misi: [
       'Menjamin keamanan dan kenyamanan seluruh murid di lingkungan sekolah.',
@@ -27,7 +27,7 @@ window.MOCK_CANDIDATES = [
   {
     no: 3,
     nama: 'Fazila Inas Tasnim M.',
-    foto: '/assets/inas.jpeg',
+    foto: '../assets/inas.jpeg',
     visi: 'Mewujudkan OSIS SMP ABBS Surakarta sebagai organisasi yang terbuka dalam mendengarkan suara siswa dan mendukung penuh pengembangan minat serta bakat siswa, seperti membaca, menulis, olahraga, seni, dan lainnya.',
     misi: [
       'Kotak Aspirasi — Ide bisa disampaikan anonim.',
@@ -39,7 +39,7 @@ window.MOCK_CANDIDATES = [
   {
     no: 4,
     nama: 'Kirana Ramadhania Larasati',
-    foto: '/assets/kirana.jpeg',
+    foto: '../assets/kirana.jpeg',
     visi: 'Menjadikan OSIS sebagai wadah yang aktif, kreatif, dan aspiratif untuk menciptakan lingkungan sekolah yang nyaman, positif, serta mendorong setiap siswa berani berkembang dan berkontribusi.',
     misi: [
       'Mendorong siswa untuk berani menyampaikan ide, pendapat, dan aspirasi.',
@@ -52,7 +52,7 @@ window.MOCK_CANDIDATES = [
   {
     no: 5,
     nama: 'Kuni Rafa Saira',
-    foto: '/assets/kuni.jpeg',
+    foto: '../assets/kuni.jpeg',
     visi: 'Mewujudkan OSIS yang aktif, inovatif, harmonis, dan berdampak nyata melalui pengembangan potensi siswa, penguatan karakter, serta kolaborasi berkelanjutan di dalam maupun di luar sekolah.',
     misi: [
       'Keagamaan dan Karakter — Mengoptimalkan kegiatan keagamaan untuk menumbuhkan keimanan, kedisiplinan, dan karakter positif siswa.',
