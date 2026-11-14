@@ -37,7 +37,8 @@
     if (!candidate.foto_url) return fallback;
 
     const img = el('img', className);
-    img.src = candidate.foto_url;
+    // foto_url di DB absolut ("/assets/..") — ubah jadi relatif dari /pantau/.
+    img.src = candidate.foto_url.startsWith('/') ? `..${candidate.foto_url}` : candidate.foto_url;
     img.alt = `Foto ${candidate.nama}`;
     img.addEventListener('error', () => img.replaceWith(fallback), { once: true });
     return img;
